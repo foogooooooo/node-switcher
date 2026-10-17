@@ -4,6 +4,12 @@ node_modules/
 dist/
 build/
 coverage/
+.tools/
+.research/
+.artifacts/
+release/
+playwright-report/
+test-results/
 
 # Local settings, credentials and proxy configuration
 .env

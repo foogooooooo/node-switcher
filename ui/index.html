@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Node Switcher</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="route-icon" viewBox="0 0 24 24"><path d="M5 5h6a5 5 0 0 1 5 5v4M5 19h6a5 5 0 0 0 5-5m0 0h5M3 3h4v4H3zM3 17h4v4H3zM19 12h3v4h-3z"/></symbol>
+    <symbol id="sliders" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6m8 4v6"/></symbol>
+    <symbol id="history-icon" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6m3-4v6l4 2"/></symbol>
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+    <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="trash" viewBox="0 0 24 24"><path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/></symbol>
+    <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a19 19 0 0 1 0 18 19 19 0 0 1 0-18"/></symbol>
+  </defs></svg>
+  <div id="demo-banner" class="demo-banner" hidden>演示模式：使用合成节点与隔离配置，不会修改真实客户端。</div>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark"><svg><use href="#route-icon"/></svg></span><span>Node Switcher<small>本地分流工具</small></span></div>
+      <nav aria-label="主导航">
+        <button class="nav-item active" data-page="rules"><svg><use href="#route-icon"/></svg>分流规则<span id="nav-count">0</span></button>
+        <button class="nav-item" data-page="connection"><svg><use href="#sliders"/></svg>连接设置</button>
+        <button class="nav-item" data-page="history"><svg><use href="#history-icon"/></svg>恢复记录</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="local-dot"></span>数据留在这台电脑<small id="version-label">预览版</small></div>
+    </aside>
+    <main>
+      <header class="topbar"><span id="breadcrumb">工作空间 / 分流规则</span><span class="local-label">本地运行 <span class="local-dot"></span></span></header>
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+      <section id="rules-page" class="page">
+        <div class="page-heading"><div><h1>给每个网站，安排好出口。</h1><p>添加网站，选择节点。配置和生效检查交给我们。</p></div><button id="refresh" class="button subtle">重新识别</button></div>
+        <div id="client-summary" class="client-summary"><span class="client-emblem"><svg><use href="#sliders"/></svg></span><div class="client-info"><strong id="client-name">正在查找本地客户端</strong><span id="client-detail">只读取已适配客户端的配置目录。</span></div><span id="client-badge" class="badge neutral">识别中</span><button id="open-connection" class="text-button">连接设置</button></div>
+        <div class="workbench">
+          <div class="editor">
+            <section class="composer panel" aria-labelledby="add-heading">
+              <h2 id="add-heading">添加分流网站</h2>
+              <form id="add-form">
+                <label for="website">网站域名或网址</label>
+                <div class="website-input"><svg><use href="#globe"/></svg><input id="website" name="website" autocomplete="off" placeholder="例如 example.com，或粘贴完整网址" maxlength="2048" required></div>
+                <div class="form-bottom"><div><label for="match">匹配范围</label><select id="match"><option value="suffix">此域名及子域名</option><option value="exact">仅此域名</option></select></div><div class="target-field"><label for="target">使用出口</label><select id="target" required><option value="">连接客户端后选择</option></select></div><button id="add-rule" class="button secondary" type="submit"><svg><use href="#plus"/></svg>添加</button></div>
+              </form>
+              <p class="field-help">网址会转换为域名。登录、图片等关联域名需要另外添加。</p>
+            </section>
+            <section class="routes panel" aria-labelledby="routes-heading">
+              <div class="section-heading"><h2 id="routes-heading">我的分流规则 <span id="rule-count" class="counter">0</span></h2><span id="draft-label" class="muted">暂无规则</span></div>
+              <div id="empty-state" class="empty-state"><span class="empty-symbol"><svg><use href="#route-icon"/></svg></span><h3>从第一个网站开始</h3><p>让常用网站使用固定的节点或策略组，<br>其他流量继续遵循原有配置。</p></div>
+              <div id="routes-list" class="routes-list"></div>
+              <div id="route-footer" class="route-footer" hidden>更具体的域名优先匹配。编辑后需要重新应用。</div>
+            </section>
+          </div>
+          <aside class="apply-panel panel" aria-labelledby="apply-heading">
+            <span class="apply-symbol"><svg><use href="#check"/></svg></span><h2 id="apply-heading">准备好，再应用</h2><p>规则写入当前配置后，<br>立即检查内核是否正确加载。</p>
+            <div class="apply-summary"><span>本次管理的规则</span><strong id="apply-count">0 条</strong></div>
+            <button id="preview" class="button primary full" disabled>检查并预览<svg><use href="#arrow"/></svg></button>
+            <p id="apply-hint" class="apply-hint">先连接本地客户端并添加网站。</p>
+            <button id="quick-undo" class="text-button full" hidden>撤销最近一次应用</button>
+            <ol class="apply-steps"><li><span>1</span><div><strong>校验配置</strong><small>确认域名、出口与内核语法</small></div></li><li><span>2</span><div><strong>备份并写入</strong><small>保留原脚本与原有规则</small></div></li><li><span>3</span><div><strong>重载并核验</strong><small>从内核回读实际生效结果</small></div></li></ol>
+          </aside>
+        </div>
+      </section>
+      <section id="connection-page" class="page" hidden>
+        <div class="page-heading"><div><h1>连接你的代理客户端</h1><p>读取本机节点与策略组，选择需要管理的配置。</p></div><button id="discover" class="button secondary">重新查找</button></div>
+        <section class="panel connection-panel"><h2>已发现的客户端</h2><div id="candidates"></div><p id="no-candidates" class="field-help" hidden>没有自动识别到客户端。可以手动选择 Clash Verge Rev 数据目录，或独立 Mihomo 的运行配置。</p></section>
+        <section class="panel connection-panel"><h2>手动连接</h2><div class="connection-row"><div><strong>Clash Verge Rev 数据目录</strong><p>适用于便携版或自定义安装位置；目录内应有 profiles.yaml。</p></div><button id="choose-verge" class="button secondary">选择目录</button></div><div class="connection-row"><div><strong>独立 Mihomo 运行配置</strong><p>选择内核实际加载的 YAML 文件。第三方客户端请优先使用专属适配。</p></div><button id="choose-config" class="button secondary">选择配置</button></div></section>
+        <section class="panel connection-panel"><h2>应用前的内核校验</h2><div class="connection-row"><div><strong id="binary-name">尚未找到 Mihomo 内核</strong><p>使用现有内核检查生成的配置，不下载或安装代理内核。</p></div><button id="choose-binary" class="button secondary">选择内核</button></div></section>
+        <p class="connection-note">只连接本机控制接口。节点凭据不会传入界面，也不会上传到服务器。</p>
+      </section>
+      <section id="history-page" class="page" hidden><div class="page-heading"><div><h1>每次改动，都有退路。</h1><p>备份保存在本机；恢复前会检查是否有其他程序的后续修改。</p></div><button id="show-backups" class="button secondary">打开备份目录</button></div><section class="panel history-panel"><div id="history-list"></div></section></section>
+    </main>
+  </div>
+  <dialog id="preview-dialog" aria-labelledby="preview-title"><div class="dialog-header"><div><span class="badge good">校验通过</span><h2 id="preview-title">确认这次分流改动</h2></div><button id="close-preview" class="icon-button" aria-label="关闭预览">×</button></div><p id="preview-profile" class="muted"></p><div id="preview-rules" class="preview-rules"></div><div id="preview-warnings" class="preview-warnings"></div><div id="preview-files" class="preview-files"></div><p class="dialog-note">将创建本地备份，再写入配置并重载内核。现有连接可能继续使用原出口，新连接按新规则处理。</p><div class="dialog-actions"><button id="cancel-preview" class="button secondary">返回编辑</button><button id="apply" class="button primary">应用并生效</button></div></dialog>
+</body>
+</html>

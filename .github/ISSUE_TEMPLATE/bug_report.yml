@@ -4,7 +4,7 @@ title: "[Bug] "
 body:
   - type: markdown
     attributes:
-      value: "当前仍处于立项阶段，尚无正式安装包。请使用脱敏信息描述问题。"
+      value: "当前为 Alpha 开发预览版。请注明版本和客户端，使用脱敏信息描述问题，不要附真实节点凭据或完整配置。"
   - type: input
     id: version
     attributes:
