@@ -1,0 +1,24 @@
+# Local development environments and build output
+.venv/
+node_modules/
+dist/
+build/
+coverage/
+
+# Local settings, credentials and proxy configuration
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+config.local/
+secrets/
+*.key
+*.pem
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

@@ -1,0 +1,25 @@
+name: 功能建议
+description: 提交使用场景、兼容需求或改进建议
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: "请勿提交订阅地址、控制接口密钥、私人节点信息或完整配置。"
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景与问题
+      description: 你目前如何切换节点？哪个步骤最影响效率？
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望的操作与结果
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 操作系统与客户端
+      placeholder: "例如：macOS / Windows / Linux，客户端名称及版本"
