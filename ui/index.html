@@ -34,46 +34,47 @@
       <header class="topbar"><span id="breadcrumb">工作空间 / 分流规则</span><span class="local-label">本地运行 <span class="local-dot"></span></span></header>
       <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
       <section id="rules-page" class="page">
-        <div class="page-heading"><div><h1>给每个网站，安排好出口。</h1><p>添加网站，选择节点。配置和生效检查交给我们。</p></div><button id="refresh" class="button subtle">重新识别</button></div>
+        <div class="page-heading"><div><h1>这个网站，走哪个节点？</h1><p>粘贴网址，选好出口，剩下的交给我们。</p></div><button id="refresh" class="button subtle">刷新连接</button></div>
         <div id="client-summary" class="client-summary"><span class="client-emblem"><svg><use href="#sliders"/></svg></span><div class="client-info"><strong id="client-name">正在查找本地客户端</strong><span id="client-detail">只读取已适配客户端的配置目录。</span></div><span id="client-badge" class="badge neutral">识别中</span><button id="open-connection" class="text-button">连接设置</button></div>
+        <div id="setup-help" class="setup-help" hidden><div><strong id="setup-title">先打开你的代理客户端</strong><p id="setup-description">保持 Clash Verge Rev 运行，然后重新查找。已有节点会自动显示在这里。</p></div><button id="setup-action" class="button secondary">去连接</button></div>
+        <ol class="journey" aria-label="操作步骤"><li id="step-connect"><span>1</span>连接客户端</li><li id="step-edit"><span>2</span>添加网站，选择出口</li><li id="step-apply"><span>3</span>确认生效</li></ol>
         <div class="workbench">
           <div class="editor">
             <section class="composer panel" aria-labelledby="add-heading">
-              <h2 id="add-heading">添加分流网站</h2>
+              <h2 id="add-heading">添加一个网站</h2>
               <form id="add-form">
-                <label for="website">网站域名或网址</label>
-                <div class="website-input"><svg><use href="#globe"/></svg><input id="website" name="website" autocomplete="off" placeholder="例如 example.com，或粘贴完整网址" maxlength="2048" required></div>
-                <div class="form-bottom"><div><label for="match">匹配范围</label><select id="match"><option value="suffix">此域名及子域名</option><option value="exact">仅此域名</option></select></div><div class="target-field"><label for="target">使用出口</label><select id="target" required><option value="">连接客户端后选择</option></select></div><button id="add-rule" class="button secondary" type="submit"><svg><use href="#plus"/></svg>添加</button></div>
+                <div class="entry-fields"><div><label for="website">网站</label><div class="website-input"><svg><use href="#globe"/></svg><input id="website" name="website" autocomplete="off" spellcheck="false" placeholder="粘贴网址，或输入 example.com" maxlength="2048" aria-describedby="website-help form-error" required></div><p id="website-help" class="field-help">支持完整网址，自动提取域名。</p></div>
+                <div class="target-field"><div class="target-label"><label for="target">让它走这个出口</label><div class="target-search"><label class="sr-only" for="target-search">搜索节点或策略组</label><input id="target-search" type="search" autocomplete="off" placeholder="搜索出口…" aria-describedby="target-help"></div></div><select id="target" required><option value="">连接后选择节点</option></select><p id="target-help" class="field-help">可以选择节点、策略组或直连。</p></div></div>
+                <div class="composer-bottom"><details id="match-options" class="advanced"><summary>更多选项 · <span id="match-summary">包含子域名</span></summary><label for="match">哪些地址使用这个出口</label><select id="match"><option value="suffix">此域名及子域名（默认）</option><option value="exact">仅这个域名</option></select><p class="field-help">例如 example.com 包含 www.example.com；输入 www.example.com 不包含 example.com。</p></details><button id="add-rule" class="button secondary" type="submit"><svg><use href="#plus"/></svg>加入列表</button></div>
+                <p id="form-error" class="form-error" role="alert" hidden></p>
               </form>
-              <p class="field-help">网址会转换为域名。登录、图片等关联域名需要另外添加。</p>
+              <p class="field-help">登录、图片等其他域名需要另外添加。</p>
             </section>
             <section class="routes panel" aria-labelledby="routes-heading">
-              <div class="section-heading"><h2 id="routes-heading">我的分流规则 <span id="rule-count" class="counter">0</span></h2><span id="draft-label" class="muted">暂无规则</span></div>
+              <div class="section-heading"><h2 id="routes-heading">网站与出口 <span id="rule-count" class="counter">0</span></h2><span id="draft-label" class="muted">暂无规则</span></div>
               <div id="empty-state" class="empty-state"><span class="empty-symbol"><svg><use href="#route-icon"/></svg></span><h3>从第一个网站开始</h3><p>让常用网站使用固定的节点或策略组，<br>其他流量继续遵循原有配置。</p></div>
               <div id="routes-list" class="routes-list"></div>
+              <div id="remove-feedback" class="remove-feedback" hidden><span id="remove-message"></span><button id="undo-remove" class="text-button">撤销删除</button></div>
               <div id="route-footer" class="route-footer" hidden>更具体的域名优先匹配。编辑后需要重新应用。</div>
             </section>
           </div>
           <aside class="apply-panel panel" aria-labelledby="apply-heading">
-            <span class="apply-symbol"><svg><use href="#check"/></svg></span><h2 id="apply-heading">准备好，再应用</h2><p>规则写入当前配置后，<br>立即检查内核是否正确加载。</p>
-            <div class="apply-summary"><span>本次管理的规则</span><strong id="apply-count">0 条</strong></div>
-            <button id="preview" class="button primary full" disabled>检查并预览<svg><use href="#arrow"/></svg></button>
-            <p id="apply-hint" class="apply-hint">先连接本地客户端并添加网站。</p>
+            <div class="save-status"><h2 id="apply-heading">添加网站后，在这里保存</h2><p id="apply-hint" class="apply-hint">我们会先检查并备份，再让分流生效。</p><span id="apply-count" class="sr-only">0 条</span></div>
+            <div class="save-actions"><button id="discard-draft" class="text-button" hidden>放弃改动</button><button id="preview" class="button primary" disabled>保存并生效<svg><use href="#arrow"/></svg></button></div>
             <button id="quick-undo" class="text-button full" hidden>撤销最近一次应用</button>
-            <ol class="apply-steps"><li><span>1</span><div><strong>校验配置</strong><small>确认域名、出口与内核语法</small></div></li><li><span>2</span><div><strong>备份并写入</strong><small>保留原脚本与原有规则</small></div></li><li><span>3</span><div><strong>重载并核验</strong><small>从内核回读实际生效结果</small></div></li></ol>
           </aside>
         </div>
       </section>
       <section id="connection-page" class="page" hidden>
         <div class="page-heading"><div><h1>连接你的代理客户端</h1><p>读取本机节点与策略组，选择需要管理的配置。</p></div><button id="discover" class="button secondary">重新查找</button></div>
         <section class="panel connection-panel"><h2>已发现的客户端</h2><div id="candidates"></div><p id="no-candidates" class="field-help" hidden>没有自动识别到客户端。可以手动选择 Clash Verge Rev 数据目录，或独立 Mihomo 的运行配置。</p></section>
-        <section class="panel connection-panel"><h2>手动连接</h2><div class="connection-row"><div><strong>Clash Verge Rev 数据目录</strong><p>适用于便携版或自定义安装位置；目录内应有 profiles.yaml。</p></div><button id="choose-verge" class="button secondary">选择目录</button></div><div class="connection-row"><div><strong>独立 Mihomo 运行配置</strong><p>选择内核实际加载的 YAML 文件。第三方客户端请优先使用专属适配。</p></div><button id="choose-config" class="button secondary">选择配置</button></div></section>
+        <details id="manual-connection" class="panel connection-panel"><summary>没有找到？手动选择客户端</summary><div class="connection-row"><div><strong>Clash Verge Rev 数据目录</strong><p>适用于便携版或自定义安装位置；目录内应有 profiles.yaml。</p></div><button id="choose-verge" class="button secondary">选择目录</button></div><div class="connection-row"><div><strong>独立 Mihomo 运行配置</strong><p>选择内核实际加载的 YAML 文件。第三方客户端请优先使用专属适配。</p></div><button id="choose-config" class="button secondary">选择配置</button></div></details>
         <section class="panel connection-panel"><h2>应用前的内核校验</h2><div class="connection-row"><div><strong id="binary-name">尚未找到 Mihomo 内核</strong><p>使用现有内核检查生成的配置，不下载或安装代理内核。</p></div><button id="choose-binary" class="button secondary">选择内核</button></div></section>
         <p class="connection-note">只连接本机控制接口。节点凭据不会传入界面，也不会上传到服务器。</p>
       </section>
       <section id="history-page" class="page" hidden><div class="page-heading"><div><h1>每次改动，都有退路。</h1><p>备份保存在本机；恢复前会检查是否有其他程序的后续修改。</p></div><button id="show-backups" class="button secondary">打开备份目录</button></div><section class="panel history-panel"><div id="history-list"></div></section></section>
     </main>
   </div>
-  <dialog id="preview-dialog" aria-labelledby="preview-title"><div class="dialog-header"><div><span class="badge good">校验通过</span><h2 id="preview-title">确认这次分流改动</h2></div><button id="close-preview" class="icon-button" aria-label="关闭预览">×</button></div><p id="preview-profile" class="muted"></p><div id="preview-rules" class="preview-rules"></div><div id="preview-warnings" class="preview-warnings"></div><div id="preview-files" class="preview-files"></div><p class="dialog-note">将创建本地备份，再写入配置并重载内核。现有连接可能继续使用原出口，新连接按新规则处理。</p><div class="dialog-actions"><button id="cancel-preview" class="button secondary">返回编辑</button><button id="apply" class="button primary">应用并生效</button></div></dialog>
+  <dialog id="preview-dialog" aria-labelledby="preview-title"><div class="dialog-header"><div><span class="badge good">检查通过</span><h2 id="preview-title">让这些网站走你选的出口</h2></div><button id="close-preview" class="icon-button" aria-label="关闭预览">×</button></div><p id="preview-profile" class="muted"></p><p id="preview-changes" class="change-summary"></p><div id="preview-rules" class="preview-rules"></div><div id="preview-warnings" class="preview-warnings"></div><details id="preview-details" class="advanced"><summary>查看配置文件详情</summary><div id="preview-files" class="preview-files"></div></details><p class="dialog-note">自动备份，可撤销。生效后重新打开网站试试；已有连接可能继续使用原出口。</p><div class="dialog-actions"><button id="cancel-preview" class="button secondary">返回修改</button><button id="apply" class="button primary">确认生效</button></div></dialog>
 </body>
 </html>

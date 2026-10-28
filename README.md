@@ -6,13 +6,13 @@
 
 A local desktop routing editor for Mihomo and Clash Verge Rev. Map domains to existing proxy nodes or groups, apply immediately, and undo with verified local backups.
 
-> **v0.1.0-alpha.1：开发预览版。** 首轮验证环境为 macOS Apple Silicon、Clash Verge Rev 2.4.7 / Mihomo 1.19.21。Windows / Linux 的桌面集成、其他客户端版本及开发者签名分发仍待验证，不承诺通用兼容。
+> **v0.1.0-alpha.2：开发预览版。** 首轮验证环境为 macOS Apple Silicon、Clash Verge Rev 2.4.7 / Mihomo 1.19.21。Windows / Linux 的桌面集成、其他客户端版本及开发者签名分发仍待验证，不承诺通用兼容。
 
 ## 已实现
 
 - 自动发现标准目录下的 Clash Verge Rev；支持手动选择数据目录或独立 Mihomo 运行配置。
 - 通过本机 TCP、Unix socket 或 Windows 命名管道控制接口读取节点与策略组。
-- 添加网站，选择“仅此域名”或“此域名及子域名”，指定已有节点、策略组或直连。
+- 粘贴网址自动提取域名，按名称筛选已有节点、策略组或直连。默认包含子域名，可在“更多选项”改为仅此域名。
 - 应用前规范化域名、检查重复与出口存在性，使用用户已有的 Mihomo 内核校验配置。
 - 预览后直接备份、写入、重载，并从内核回读已加载的规则；未确认成功时不会显示生效。
 - 编辑或删除本工具管理的规则；保留其他规则与原有扩展脚本。
@@ -22,8 +22,10 @@ A local desktop routing editor for Mihomo and Clash Verge Rev. Map domains to ex
 
 1. 保持代理客户端运行，并使用**规则模式**，打开 Node Switcher。
 2. 确认识别到的是需要管理的客户端和订阅；无法识别时进入“连接设置”手动选择。
-3. 输入网站并选择出口，点击“添加”。
-4. 点击“检查并预览”，确认规则与目标配置，再点击“应用并生效”。
+3. 输入网站并选择出口，点击“加入列表”；可以继续添加多个网站。
+4. 点击底部“保存并生效”，确认网站与出口，再点击“确认生效”。
+
+删除列表中的网站后可以立即“撤销删除”，尚未保存的改动可以统一放弃。若输入框还有网站未加入列表，工具会提示先处理，避免遗漏。缺少内核、未使用规则模式或连接中断时，首页会显示下一步操作。
 
 需要撤销时，打开“恢复记录”。若配置已有后续修改，自动恢复会停止，避免覆盖这些修改。
 

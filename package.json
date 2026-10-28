@@ -1,6 +1,6 @@
 {
   "name": "node-switcher",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "Local desktop routing editor for Mihomo and Clash Verge Rev",
   "private": true,
   "type": "module",
